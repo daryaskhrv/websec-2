@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Roboto', sans-serif;
-    background: rgd(245,247,252);
+    background: rgb(245,247,252);
 }
 
 /* HEADER */
@@ -73,7 +73,7 @@ body {
 }
 
 
-#select_language {
+#select_language1 {
     border: none;
     background: transparent;
     font-size: 14px;
@@ -292,6 +292,57 @@ body {
 #orange { color: #fd7e14; background-color: #fff3e0; }
 
 
+/* Контейнер недель */
+.weeks {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 10px 40px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Текущая неделя */
+#currentWeek {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    color: #3b8bdb;
+}
+
+/* Кнопки */
+#previousButton, 
+#nextButton {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #3b8bdb;
+    transition: color 0.2s ease;
+}
+
+/* Эффекты при наведении */
+#previousButton:hover, 
+#nextButton:hover {
+    color: #0066cc;
+    text-decoration: underline;
+}
+
+#previousButton {
+    margin-right: auto; 
+}
+
+#nextButton {
+    margin-left: auto;
+}
+
+
 /* FOOTER */
 .footer_1 {
     background-color: rgb(222,226,234);
@@ -325,7 +376,7 @@ body {
 }
 
 
-#select_language {
+#select_language2 {
     border: none;
     background: transparent;
     font-size: 14px;
