@@ -23,8 +23,6 @@ function updateWeek(change) {
 }
 
 
-
-
 // Обработчик поиска
 document.getElementById('search_schedule').addEventListener('input', debounce(function(e) {
     const query = e.target.value.trim();
@@ -59,7 +57,6 @@ function debounce(func, wait) {
         }, wait);
     };
 }
-
 
 
 function updateSchedule(url) {
