@@ -292,7 +292,6 @@ body {
 #orange { color: #fd7e14; background-color: #fff3e0; }
 
 
-/* Контейнер недель */
 .weeks {
     display: flex;
     flex-direction: row;
@@ -464,4 +463,23 @@ body {
     margin: 0; 
     padding-right: 20px;
     font-size: 14px;
+}
+
+
+@media (max-width: 768px) {
+    .header {
+        justify-content: space-between;
+    }
+    
+    .left > *:not(.menu_burger) {
+        display: none !important;
+    }
+    
+    .right > *:not(.account) {
+        display: none !important;
+    }
+
+    .right p {
+        display: none !important;
+    }
 }

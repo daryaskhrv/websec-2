@@ -10,7 +10,7 @@
     background-color: #ffffff;
     font-weight: bold;
     text-align: center;
-    border-bottom: 2px solid #1e88e5; /* Синяя полоска */
+    border-bottom: 2px solid #1e88e5; 
 }
 
 #schedule_table .one-row {
@@ -55,7 +55,6 @@
     content: "";
 }
 
-/* Стили для ссылок (преподаватели) */
 .text-style1 a {
     color: #1e88e5;
     text-decoration: none;
@@ -64,3 +63,39 @@
 .text-style1 a:hover {
     text-decoration: underline;
 }
+
+
+@media screen and (max-width: 950px) {
+    #schedule_table td:nth-last-child(1),
+    #schedule_table th:nth-last-child(1) {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 820px) {
+    #schedule_table td:nth-last-child(2),
+    #schedule_table th:nth-last-child(2) {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    #schedule_table td:nth-last-child(3),
+    #schedule_table th:nth-last-child(3) {
+        display: none;
+    }
+} 
+
+@media screen and (max-width: 600px) {
+    #schedule_table td:nth-last-child(4),
+    #schedule_table th:nth-last-child(4) {
+        display: none;
+    }
+} 
+
+@media screen and (max-width: 460px) {
+    #schedule_table td:nth-last-child(5),
+    #schedule_table th:nth-last-child(5) {
+        display: none;
+    }
+} 
