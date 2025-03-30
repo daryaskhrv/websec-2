@@ -305,6 +305,11 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.container_padding{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
 /* Текущая неделя */
 #currentWeek {
     font-size: 18px;

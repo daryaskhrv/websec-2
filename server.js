@@ -7,24 +7,21 @@ let http = require('http');
 const app = express();
 let server = http.Server(app);
 let bp = require('body-parser');
+const fs = require('fs');
+const groups = JSON.parse(fs.readFileSync('groups.json', 'utf8'));
+const lecturers = JSON.parse(fs.readFileSync('lecturer.json', 'utf8'));
 
 
-// Указываем Express обслуживать статические файлы из папки client
 app.use(express.static(path.join(__dirname, 'client')));
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
-
-app.get('/', function(request, response) {
-    response.sendFile(path.join(__dirname, 'index.html'));
-});
 
 server.listen(PORT, function() {
     console.log('Server listening on 3000 . . .');
 });
 
 
-// https://ssau.ru/rasp?groupId=531030143&selectedWeek=22&selectedWeekday=1
 app.get('/rasp', (req, res) => {
     console.log(req.url);
     let request = new XMLHttpRequest();
@@ -36,110 +33,138 @@ app.get('/rasp', (req, res) => {
             let schedule = {
                 dates: [],
                 daysOfSchedule: [],
-                times: []
+                times: [],
+                groupInfo: {},
+                pageHeader: ""
             };
             let root = HTMLParser.parse(request.responseText);
 
-            // parse days with dates
-            for (let cell of root.querySelectorAll(".schedule__item + .schedule__head")) {
-                schedule.dates.push(cell.childNodes[0].innerText + cell.childNodes[1].innerText)
+            // Парсим заголовок страницы
+            const pageHeader = root.querySelector(".page-header h1.h1-text");
+            if (pageHeader) {
+                schedule.pageHeader = pageHeader.innerText.trim();
+            }
+
+            // Парсим даты
+            for (let cell of root.querySelectorAll(".schedule__head")) {
+                if (cell.innerText.trim()) {
+                    schedule.dates.push(cell.innerText.trim());
+                }
             }
 
             console.log(root.querySelector(".week-nav-current_week")?.innerText);
 
-            // parse all cells
+            // Парсим занятия
             for (let cell of root.querySelectorAll(".schedule__item")) {
-                if (cell.childNodes[0]?.childNodes.length > 3) {
-                    // console.log(cell.childNodes[0].childNodes[3].childNodes[1]);
-                    let groups = [];
-                    if (typeof req.query.staffId === "undefined") {
-                        cell.childNodes[0].childNodes[3].childNodes
-                            .filter((group) => group.innerText.trim() !== "")
-                            .map((group) => {
-                                let ind1 = 0;
-                                while (!isNumber(group.toString()[ind1]) && ind1 < 100) ind1++;
-                                let ind2 = ind1;
-                                while (isNumber(group.toString()[ind2]) && ind2 < 100) ind2++;
-                                while (group.toString()[ind1] !== "?" && ind1 > 0) ind1--;
-                                let id = group.toString().slice(ind1, ind2);
-                                groups.push(JSON.stringify({
-                                    name: group.innerText,
-                                    link: isNumber(id[id.length - 4]) ? `/rasp${id}` : null
-                                }))
-                            })
-                    } else {
-                        let groupsElements = cell.querySelectorAll("a")
-                            .filter((group) => group.innerText.trim() !== "")
-                            .map((group) => {
-                                let ind1 = 0;
-                                while (!isNumber(group.toString()[ind1]) && ind1 < 100) ind1++;
-                                let ind2 = ind1;
-                                while (isNumber(group.toString()[ind2]) && ind2 < 100) ind2++;
-                                while (group.toString()[ind1] !== "?" && ind1 > 0) ind1--;
-                                let id = group.toString().slice(ind1, ind2);
-                                groups.push(JSON.stringify({
-                                    name: group.innerText,
-                                    link: isNumber(id[id.length - 4]) ? `/rasp${id}` : null
-                                }))
-                            })
-                        console.log(groups);
+                const lessonInfo = cell.querySelector('.schedule__lesson-info');
+                
+                if (lessonInfo) {
+                    const subject = lessonInfo.querySelector('.schedule__discipline')?.innerText.trim();
+                    const place = lessonInfo.querySelector('.schedule__place')?.innerText.trim();
+                    
+                    // Парсим преподавателя
+                    let teacher = null;
+                    const teacherElement = lessonInfo.querySelector('.schedule__teacher a');
+                    if (teacherElement) {
+                        teacher = {
+                            name: teacherElement.innerText.trim(),
+                            link: teacherElement.getAttribute('href')
+                        };
                     }
-
-                    let id = "";
-                    if (typeof req.query.staffId === "undefined") {
-                        let teacher = cell.childNodes[0].childNodes[2].childNodes;
-                        let ind1 = 5;
-                        while (!isNumber(teacher.toString()[ind1]) && ind1 < 100) ind1++;
-                        let ind2 = ind1;
-                        while (isNumber(teacher.toString()[ind2]) && ind2 < 100) ind2++;
-                        while (teacher.toString()[ind1] !== "?" && ind1 > 0) ind1--;
-                        id = teacher.toString().slice(ind1, ind2);
+                    
+                    // Парсим группы
+                    let groups = [];
+                    const groupsElement = lessonInfo.querySelector('.schedule__groups');
+                    if (groupsElement) {
+                        // Проверяем, есть ли элементы с классом schedule__group (номера групп)
+                        const groupLinks = groupsElement.querySelectorAll('.schedule__group');
+                        
+                        if (groupLinks.length > 0) {
+                            groupLinks.forEach(link => {
+                                groups.push(link.innerText.trim());
+                            });
+                        } else {
+                            groups.push(groupsElement.innerText.trim());
+                        }
                     }
 
                     schedule.daysOfSchedule.push({
-                        subject: cell.childNodes[0].childNodes[0].innerText.slice(1),
-                        place: cell.childNodes[0].childNodes[1].innerText.slice(1),
-                        teacher: JSON.stringify(typeof req.query.staffId === "undefined" ? {
-                            name: cell.querySelector(".schedule__teacher")?.innerText ?? cell.childNodes[0].childNodes[2].childNodes[0].innerText,
-                            link: isNumber(id[id.length - 1]) ? `/rasp${id}` : null } : { name: "", link: "" }),
-                        groups: groups
-                    })
+                        subject: subject || null,
+                        place: place || null,
+                        teacher: JSON.stringify(teacher),
+                        groups: groups.length > 0 ? groups.join('    ') : null
+                    });
                 } else {
                     schedule.daysOfSchedule.push({
                         subject: null
-                    })
+                    });
                 }
             }
 
-            // parse times of first column
+            // Парсим время занятий
             for (let cell of root.querySelectorAll(".schedule__time")) {
-                schedule.times.push(cell.childNodes[0].innerText + " - " + cell.childNodes[1].innerText);
+                const timeText = cell.innerText.trim();
+                if (timeText) {
+                    schedule.times.push(timeText);
+                }
             }
 
-            // remove from field with subjects all headers with dates
-            schedule.daysOfSchedule = schedule.daysOfSchedule.slice(7);
+            // Парсим информацию о группе
+            const infoBlock = root.querySelector(".card-default.info-block");
+            if (infoBlock) {
+
+                const groupNumber = infoBlock.querySelector("h2.info-block__title")?.innerText.trim();
+
+                const specialtyElement = infoBlock.querySelector(".info-block__description > div:first-child");
+                const specialty = specialtyElement?.innerText.trim();
+                
+                const educationFormElement = infoBlock.querySelector(".info-block__description > div:nth-child(2)");
+                const educationForm = educationFormElement?.innerText.trim();
+                
+                const yearStartElement = infoBlock.querySelector(".info-block__semester div");
+                const yearStart = yearStartElement?.innerText.trim();
+                
+                schedule.groupInfo = {
+                    groupNumber: groupNumber || null,
+                    specialty: specialty || null,
+                    educationForm: educationForm || null,
+                    yearStart: yearStart || null
+                };
+            }
+
             schedule.currentWeek = root.querySelector(".week-nav-current_week")?.innerText.slice(1, 3).trim();
-            res.send(JSON.stringify(schedule));
+            res.json(schedule);
         }
     };
-})
-
-app.get('/groups', function(request, response) {
-	response.sendFile(__dirname + '/groups.json');
 });
 
-app.get('/teachers', function(request, response) {
-	response.sendFile(__dirname + '/lecturer.json');
+
+// поиск ID 
+app.get('/search', (req, res) => {
+    const query = req.query.q.trim();
+    
+    // Проверяем сначала группы
+    if (groups[query]) {
+        console.log(groups[query],query)
+        return res.json({
+            type: 'group',
+            id: groups[query],
+            name: query
+        });
+    }
+    
+    // Затем проверяем преподавателей
+    for (const [name, id] of Object.entries(lecturers)) {
+        if (name.toLowerCase().includes(query.toLowerCase())) {
+            console.log(id,name)
+            return res.json({
+                type: 'staff',
+                id: id,
+                name: name
+            });
+        }
+    }
+    
+    // Если ничего не найдено
+    res.status(404).json({ error: 'Not found' });
 });
-
-function isNumber(char) {
-    if (typeof char !== 'string') {
-        return false;
-    }
-
-    if (char.trim() === '') {
-        return false;
-    }
-
-    return !isNaN(char);
-}

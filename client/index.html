@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel= "stylesheet" href="styles.css">
+    <link rel= "stylesheet" href="table.css">
     <title>Schedule</title>
 </head>
 <body>
@@ -41,19 +42,18 @@
     </nav>
     <div class="container">
         <div class="table_header">
-            <h1>Расписание, 6413-100503D</h1>
+            <h1 id="h1_main"></h1>
             <div class="line"></div>
         </div>
         
         <div class="select">
-            <input type="text" class="search_schedule" placeholder="Поиск..">
+            <input type="text" id="search_schedule" class="search_schedule" placeholder="Поиск..">
         </div>
         <div class="info_block_shedule gradient">
             <div class="text">
-                <p class="text_p1">6413-100503D</p>
-                <p class="text_p2">10.05.03 Информационная безопасность автоматизированных систем<br>
-                    Специалист (Очная форма обучения)</p>
-                <p class="text_p3">Начало учебного года: 02.09.2024</p>
+                <p id="text_p1" class="text_p1"></p>
+                <p id="text_p2" class="text_p2"></p>
+                <p id="text_p3" class="text_p3"></p>
             </div>
             <div class="right_download">
                 <img class="button_download" src="img/download.png">
@@ -73,16 +73,17 @@
         </div>
     </div>
 
-    <div class="container ">
+    <div class="container container_padding">
         <div class="weeks">
             <button id="previousButton">Предыдущая неделя</button>
-            <p id="currentWeek">30 неделя</p>
+            <p id="currentWeek"> неделя</p>
             <button id="nextButton">Следующая неделя</button>
         </div>
     </div>
-
-    <table class="schedule_table">
-    </table>
+    <div class="container container_padding">
+        <table id="schedule_table">
+        </table>
+    </div>
 
     <footer class="footer">
         <div class="container footer_1">
@@ -173,5 +174,6 @@
         </div>
     </footer>
     <script src="data.js"></script>
+    <script src="client.js"></script>
 </body>
 </html>

@@ -1,0 +1,66 @@
+#schedule_table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#schedule_table .first-row {
+    background-color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #1e88e5; /* Синяя полоска */
+}
+
+#schedule_table .one-row {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+#schedule_table .one-row:hover {
+    background-color: #f9f9f9;
+}
+
+#schedule_table td {
+    padding: 12px 8px;
+    vertical-align: top;
+}
+
+#schedule_table td:first-child {
+    width: 10%; 
+    font-weight: bold;
+    color: #333;
+    border-right: 1px solid #1e88e5; 
+    background-color: #ffffff;
+}
+
+#schedule_table td:not(:first-child) {
+    width: 15%; 
+    border-right: 1px solid #e0e0e0;
+}
+
+#schedule_table td:last-child {
+    border-right: none;
+}
+
+.text-style1 {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.text-style1 br {
+    margin-bottom: 4px;
+    display: block;
+    content: "";
+}
+
+/* Стили для ссылок (преподаватели) */
+.text-style1 a {
+    color: #1e88e5;
+    text-decoration: none;
+}
+
+.text-style1 a:hover {
+    text-decoration: underline;
+}
